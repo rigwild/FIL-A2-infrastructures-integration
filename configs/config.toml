@@ -1,0 +1,14 @@
+[fakeiot]
+broadcast_interval = 10000
+mqtt_ids = [
+  '329e995a-dcae-42eb-b74c-6421569ffdb5',
+  '3f8c1132-4d5f-4258-8618-16c95dd9d2e5',
+  '67d2b5d2-417d-4391-9811-5c4579463646',
+  '49b18665-d103-42da-a86b-43982e088bb8',
+  'ce6b1c8f-bc64-447c-952d-1a91460d3a5b',
+]
+
+[mqtt]
+endpoint = 'tcp://iot.fr-par.scw.cloud:1883'
+qos = 1
+topic = 'fakeiot/sensors'
