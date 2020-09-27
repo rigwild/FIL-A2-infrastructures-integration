@@ -20,7 +20,8 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
-	opts := mqtt.NewClientOptions().AddBroker("tcp://iot.fr-par.scw.cloud:1883").SetClientID("890658db-264a-420e-9bd3-57e672b657e5")
+	opts := mqtt.NewClientOptions().AddBroker("tcp://localhost:18830").SetClientID("listener-1")
+	// opts := mqtt.NewClientOptions().AddBroker("tcp://iot.fr-par.scw.cloud:1883").SetClientID("890658db-264a-420e-9bd3-57e672b657e5")
 	opts.SetCleanSession(true)
 
 	client := mqtt.NewClient(opts)
