@@ -16,3 +16,12 @@ mqtt_ids = [
 endpoint = 'tcp://localhost:18830'
 qos = 1
 topic = 'fakeiot/sensors'
+
+[redis]
+endpoint = 'localhost:6379'
+sensor_data_prefix = 'sensor:'
+
+[listeners]
+file_logs_dir = './logs'
+file_mqtt_id = 'listener-file-1'
+redis_mqtt_id = 'listener-redis-1'
