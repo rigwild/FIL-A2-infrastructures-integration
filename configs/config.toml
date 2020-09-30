@@ -19,7 +19,8 @@ topic = 'fakeiot/sensors'
 
 [redis]
 endpoint = 'localhost:6379'
-sensor_data_prefix = 'sensor:'
+sensor_data_prefix = 'sensor'
+api_cache_time = 600
 
 [listeners]
 file_logs_dir = './logs'

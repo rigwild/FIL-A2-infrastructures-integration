@@ -3,6 +3,7 @@ package putils
 import (
 	"fmt"
 	"math/rand"
+	"strconv"
 	"strings"
 	"time"
 
@@ -25,6 +26,7 @@ func Sleep(ms int) {
 
 // LoadConfig from the TOML config file
 func LoadConfig() {
+	viper.BindEnv("FAKEIOT_POPULATE")
 	viper.SetDefault("fakeiot.broadcast_interval", 10000)
 
 	viper.SetDefault("mqtt.endpoint", "tcp://localhost:18830")
@@ -46,19 +48,14 @@ func LoadConfig() {
 	}
 }
 
-// ExtractAitaSensorFromMsg incoming from MQTT
-// sample: `fakeiot-10,CDG,wind,7.010292,2020-09-28T23:36:35+02:00`
-func ExtractAitaSensorFromMsg(msg string) (string, string) {
+// ExtractMsgData incoming from IoT MQTT message
+// sample topic: fakeiot/sensors/wind
+// sample message: CDG,7.010292,2020-09-30T14:39:51+02:00
+func ExtractMsgData(msg string) (string, float64, time.Time) {
 	s := strings.Split(msg, ",")
-	return s[1], s[2]
-}
-
-// ExtractDateFromMsg incoming from MQTT
-// sample: `fakeiot-10,CDG,wind,7.010292,2020-09-28T23:36:35+02:00`
-func ExtractDateFromMsg(msg string) time.Time {
-	s := strings.Split(msg, ",")
+	value, _ := strconv.ParseFloat(s[1], 64)
 	t, _ := time.Parse(time.RFC3339, s[len(s)-1])
-	return t
+	return s[0], value, t
 }
 
 // TimeToDate will convert a golang `time.Now()` to a YYYY-MM-DD date

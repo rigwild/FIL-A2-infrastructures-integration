@@ -3,6 +3,7 @@ package mqttfile
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"os"
 	"os/signal"
@@ -30,14 +31,15 @@ func writeFile(filePath string, txt string) {
 
 func onMessageReceived(client mqtt.Client, message mqtt.Message) {
 	payload := message.Payload()
-	spayload := string(payload)
-	fmt.Printf("%s <-- %s\n", message.Topic(), payload)
+	topic := message.Topic()
+	fmt.Printf("%s <-- %s\n", topic, payload)
 
-	t := putils.TimeToDate(putils.ExtractDateFromMsg(spayload))
-	aita, sensor := putils.ExtractAitaSensorFromMsg(spayload)
+	sensor := strings.Split(topic, viper.GetString("mqtt.topic")+"/")[1]
+	aita, value, _t := putils.ExtractMsgData(string(payload))
+	t := putils.TimeToDate(_t)
 
 	filePath := filepath.Join(viper.GetString("listeners.file_logs_dir"), aita+"-"+t+"-"+sensor+".csv")
-	writeFile(filePath, spayload)
+	writeFile(filePath, fmt.Sprintf("%s,%f,%s", aita, value, _t))
 }
 
 // RunMqttListenerFile will run a MQTT client which will save incoming IoT messages to CSV files
@@ -53,8 +55,9 @@ func RunMqttListenerFile() {
 	_mqttclient := putils.NewMqttClient(viper.GetString("listeners.redis_mqtt_id"))
 	mqttclient = _mqttclient
 
-	// MQTT subscribe and react
-	putils.SubscribeAndReact(mqttclient, viper.GetString("mqtt.topic"), onMessageReceived)
+	// MQTT subscribe to all sensors and react
+	topic := viper.GetString("mqtt.topic") + "/#"
+	putils.SubscribeAndReact(mqttclient, topic, onMessageReceived)
 
 	// Kill the process on SIGTERM
 	c := make(chan os.Signal, 1)
