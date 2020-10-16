@@ -9,6 +9,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/mux"
 	"github.com/rigwild/FIL-A2-infrastructures-integration/pkg/putils"
+	"github.com/rs/cors"
 	"github.com/spf13/viper"
 )
 
@@ -185,7 +186,13 @@ func StartServer() {
 	r.HandleFunc("/dateStats/{dateStats}", DateStatsHandler).Methods("GET")
 
 	http.Handle("/", r)
+
 	fmt.Println("The server is listening on http://localhost:8080")
-	err = http.ListenAndServe(":8080", serverLog(http.DefaultServeMux))
+
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+	})
+
+	err = http.ListenAndServe(":8080", c.Handler(serverLog(http.DefaultServeMux)))
 	log.Fatal(err)
 }
