@@ -1,4 +1,51 @@
-## Redis-stored keys
+# Airport sensors
+
+A random training project using:
+ - Golang
+ - Redis
+ - MQTT
+ - Vue.js, Vuetify
+ - Highcharts
+
+Timeline:
+1. Golang fake airport sensors periodically send data using MQTT.
+1. A Golang MQTT listener saves this data in CSV files.
+1. A Golang MQTT listener saves this data in a Redis database, and computes lots of statistics, by day, month and year.
+1. A Golang REST API serves this data.
+1. A Vue.js SPA consumes this REST API, showing some Highcharts graphs.
+1. Profit
+
+If you are a IMT student, gg and profit my dude.
+
+## Project architecture
+
+![Architecture of the project](./architecture.jpg)
+
+## Screenshot
+
+![Front-end screenshot](./screenshot.png)
+
+## API routes
+
+```
+http://localhost:8080/airports
+
+http://localhost:8080/airports/ATL/date/2020-10-06/sensors/pressure
+http://localhost:8080/airports/ATL/date/2020-10-06/sensors/temperature
+http://localhost:8080/airports/ATL/date/2020-10-06/sensors/wind
+
+http://localhost:8080/airports/CDG/dateStats/2020-10-06
+http://localhost:8080/airports/CDG/dateStats/2020-10
+http://localhost:8080/airports/CDG/dateStats/2020
+http://localhost:8080/airports/CDG/dateStats/total
+
+http://localhost:8080/dateStats/2020-10-06
+http://localhost:8080/dateStats/2020-10
+http://localhost:8080/dateStats/2020
+http://localhost:8080/dateStats/total
+```
+
+## Some Redis keys
 
 ```
 sensor|2020-09-30|ORD|count 222
@@ -57,20 +104,20 @@ sensor|total|ORD|wind|max 7.75502
 sensor|total|ORD|wind|min 4.004205
 ```
 
+## License
+
 ```
-http://localhost:8080/airports
+           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                   Version 2, December 2004
+ 
+Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
 
-http://localhost:8080/airports/ATL/date/2020-10-06/sensors/pressure
-http://localhost:8080/airports/ATL/date/2020-10-06/sensors/temperature
-http://localhost:8080/airports/ATL/date/2020-10-06/sensors/wind
+Everyone is permitted to copy and distribute verbatim or modified
+copies of this license document, and changing it is allowed as long
+as the name is changed.
+ 
+           DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+  TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
-http://localhost:8080/airports/CDG/dateStats/2020-10-06
-http://localhost:8080/airports/CDG/dateStats/2020-10
-http://localhost:8080/airports/CDG/dateStats/2020
-http://localhost:8080/airports/CDG/dateStats/total
-
-http://localhost:8080/dateStats/2020-10-06
-http://localhost:8080/dateStats/2020-10
-http://localhost:8080/dateStats/2020
-http://localhost:8080/dateStats/total
-```
+ 0. You just DO WHAT THE FUCK YOU WANT TO.
+ ```

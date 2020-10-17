@@ -78,6 +78,7 @@ func fakeData() {
 	fmt.Println("----")
 	fmt.Println("Sent " + fmt.Sprint(c) + " messages!")
 
+	putils.Sleep(100)
 	// Add fake accross last day
 	for i := -500; i < 500; i++ {
 		t := fmt.Sprint(time.Now().Add(time.Minute * time.Duration(5*i)).Format(time.RFC3339))
