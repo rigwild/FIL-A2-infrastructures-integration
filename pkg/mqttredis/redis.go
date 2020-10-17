@@ -20,8 +20,8 @@ import (
 var redisconn redis.Conn
 var mqttclient mqtt.Client
 
-func redisAppend(key string, time time.Time, value float64) {
-	_, err := redisconn.Do("APPEND", key, fmt.Sprintf(",{\"v\":%f,\"d\":\"%s\"}", value, time))
+func redisAppend(key string, _time time.Time, value float64) {
+	_, err := redisconn.Do("APPEND", key, fmt.Sprintf(",{\"v\":%f,\"d\":\"%s\"}", value, _time.Format(time.RFC3339)))
 	if err != nil {
 		log.Fatal(err)
 	}

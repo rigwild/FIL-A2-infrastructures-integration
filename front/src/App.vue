@@ -1,60 +1,98 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
+    <v-app-bar app color="primary" dark>
       <div class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
           class="shrink mr-2"
           contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          src="https://www.flaticon.com/svg/static/icons/svg/3631/3631218.svg"
           transition="scale-transition"
           width="40"
         />
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
+        <h1>Airports sensors</h1>
       </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
     </v-app-bar>
 
     <v-main>
-      <HelloWorld/>
+      <v-container>
+        <div v-if="isLoading" class="text-center">
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        </div>
+
+        <div v-else>
+          <h1>Global statistics</h1>
+          <v-expansion-panels>
+            <v-expansion-panel>
+              <v-expansion-panel-header>Click to show/hide</v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <GlobalStatistics />
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+
+          <h1 class="mt-5 pt-5">Airport statistics</h1>
+          <v-row>
+            <v-col sm="4">
+              <SelectAirport @changeAirport="changeAirport" :airports="airports" />
+            </v-col>
+            <v-col sm="8">
+              <v-card class="mx-auto" tile>
+                <AirportData :airport="selectedAirport" />
+              </v-card>
+            </v-col>
+          </v-row>
+        </div>
+      </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import { apiAirportsList } from './utils'
+
+import GlobalStatistics from './components/GlobalStatistics'
+import SelectAirport from './components/SelectAirport'
+import AirportData from './components/AirportData'
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
+    GlobalStatistics,
+    SelectAirport,
+    AirportData
   },
 
-  data: () => ({
-    //
-  }),
-};
+  data() {
+    return {
+      isLoading: true,
+      airports: null,
+      selectedAirport: null
+    }
+  },
+
+  async mounted() {
+    this.isLoading = true
+    try {
+      await this.getAirportsList()
+      this.selectedAirport = this.airports[0]
+    } catch (error) {
+    } finally {
+      this.isLoading = false
+    }
+  },
+
+  methods: {
+    changeAirport(airport) {
+      this.selectedAirport = airport
+    },
+
+    async getAirportsList() {
+      const airports = await apiAirportsList()
+      this.airports = airports.aitas
+    }
+  }
+}
 </script>
