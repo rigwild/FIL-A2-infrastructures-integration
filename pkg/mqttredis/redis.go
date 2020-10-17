@@ -75,6 +75,10 @@ func onMessageReceived(client mqtt.Client, message mqtt.Message) {
 	sensor := strings.Split(topic, viper.GetString("mqtt.topic")+"/")[1]
 	aita, value, _t := putils.ExtractMsgData(string(payload))
 	date := putils.TimeToDate(_t)
+	// Handle bad dates
+	if date == "1-01-01" {
+		return
+	}
 
 	sensorDataPrefix := viper.GetString("redis.sensor_data_prefix")
 

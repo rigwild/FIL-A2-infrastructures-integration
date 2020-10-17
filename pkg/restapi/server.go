@@ -13,8 +13,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var redisconn redis.Conn
-
 func serverLog(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL)
@@ -25,14 +23,17 @@ func serverLog(handler http.Handler) http.Handler {
 // AirportHandler will give the list of AITA codes available
 func AirportHandler(w http.ResponseWriter, r *http.Request) {
 	type APIResponse struct {
-		Aitas []string `json:"aitas"`
+		Aitas []putils.Airport `json:"aitas"`
 	}
-	json.NewEncoder(w).Encode(APIResponse{putils.Aita})
+	json.NewEncoder(w).Encode(APIResponse{putils.AitaFull})
 }
 
 // AirportAitaDateSensorHandler will give data about sensors in an airport at a precise day (full sensor data history)
 // /airports/ATL/date/2020-09-30/sensors/pressure
 func AirportAitaDateSensorHandler(w http.ResponseWriter, r *http.Request) {
+	redisconn := connectRedis()
+	defer redisconn.Close()
+
 	vars := mux.Vars(r)
 	key := fmt.Sprintf("%s|%s|%s|%s", viper.GetString("redis.sensor_data_prefix"), vars["date"], vars["aita"], vars["sensor"])
 
@@ -63,6 +64,9 @@ func AirportAitaDateSensorHandler(w http.ResponseWriter, r *http.Request) {
 // AirportAitaDateStatsHandler will give stats about date at an airport (date can be "total")
 // /airports/ATL/dateStats/2020
 func AirportAitaDateStatsHandler(w http.ResponseWriter, r *http.Request) {
+	redisconn := connectRedis()
+	defer redisconn.Close()
+
 	vars := mux.Vars(r)
 	key := fmt.Sprintf("%s|%s|%s", viper.GetString("redis.sensor_data_prefix"), vars["dateStats"], vars["aita"])
 
@@ -115,6 +119,9 @@ func AirportAitaDateStatsHandler(w http.ResponseWriter, r *http.Request) {
 // DateStatsHandler will give statistics of of a date (date can be "total")
 // /dateStats/2020
 func DateStatsHandler(w http.ResponseWriter, r *http.Request) {
+	redisconn := connectRedis()
+	defer redisconn.Close()
+
 	vars := mux.Vars(r)
 	key := fmt.Sprintf("%s|%s", viper.GetString("redis.sensor_data_prefix"), vars["dateStats"])
 
@@ -164,19 +171,17 @@ func DateStatsHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// StartServer Starts the fakeiot API
-func StartServer() {
-	putils.LoadConfig()
-
-	// Connect to the Redis instance
-	_redisconn, err := redis.Dial("tcp", viper.GetString("redis.endpoint"))
+func connectRedis() redis.Conn {
+	redisconn, err := redis.Dial("tcp", viper.GetString("redis.endpoint"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	redisconn = _redisconn
+	return redisconn
+}
 
-	// Close the redis connection on exit
-	defer redisconn.Close()
+// StartServer Starts the fakeiot API
+func StartServer() {
+	putils.LoadConfig()
 
 	r := mux.NewRouter()
 	r.HandleFunc("/airports", AirportHandler).Methods("GET")
@@ -193,6 +198,6 @@ func StartServer() {
 		AllowedOrigins: []string{"*"},
 	})
 
-	err = http.ListenAndServe(":8080", c.Handler(serverLog(http.DefaultServeMux)))
+	err := http.ListenAndServe(":8080", c.Handler(serverLog(http.DefaultServeMux)))
 	log.Fatal(err)
 }
