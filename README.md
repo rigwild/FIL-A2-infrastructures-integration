@@ -63,15 +63,12 @@ http://localhost:8080/airports
 http://localhost:8080/airports/ATL/date/2020-10-06/sensors/pressure
 http://localhost:8080/airports/ATL/date/2020-10-06/sensors/temperature
 http://localhost:8080/airports/ATL/date/2020-10-06/sensors/wind
-http://localhost:8080/airports/ATL/date/2025-10-06/sensors/pressure
 
-http://localhost:8080/airports/CDG/dateStats/2025-10-06
 http://localhost:8080/airports/CDG/dateStats/2020-10-06
 http://localhost:8080/airports/CDG/dateStats/2020-10
 http://localhost:8080/airports/CDG/dateStats/2020
 http://localhost:8080/airports/CDG/dateStats/total
 
-http://localhost:8080/dateStats/2025-10-06
 http://localhost:8080/dateStats/2020-10-06
 http://localhost:8080/dateStats/2020-10
 http://localhost:8080/dateStats/2020

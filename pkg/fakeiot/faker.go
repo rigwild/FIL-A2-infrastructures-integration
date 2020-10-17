@@ -46,21 +46,51 @@ func fakeData() {
 		panic(token.Error())
 	}
 	c := 0
-	for i := 10; i <= 30; i++ { // Day
-		for k := 6; k < 9; k++ { // Month
-			for l := 2017; l < 2020; l++ { // Year
-				for j := 0; j < 5; j++ {
-					t := fmt.Sprint(time.Now().Format(time.RFC3339))
-					t = strings.Split(t, "T")[1]
-					t = fmt.Sprint(l) + "-0" + fmt.Sprint(k) + "-" + fmt.Sprint(i) + "T" + t
-					publishRaw(client, viper.GetString("mqtt.topic")+"/pressure", fmt.Sprintf("%s,%f,%s", putils.Aita[j], putils.RandFloat(1048, 1053), t))
-					publishRaw(client, viper.GetString("mqtt.topic")+"/temperature", fmt.Sprintf("%s,%f,%s", putils.Aita[j], putils.RandFloat(19, 28), t))
-					publishRaw(client, viper.GetString("mqtt.topic")+"/wind", fmt.Sprintf("%s,%f,%s", putils.Aita[j], putils.RandFloat(4, 8), t))
+	currentTime := fmt.Sprint(time.Now().Format(time.RFC3339))
+	// Add fake data accross the year
+	for i := 1; i <= 31; i++ { // Day
+		putils.Sleep(100)
+		for k := 1; k <= 12; k++ { // Month
+			for l := 2019; l <= 2020; l++ { // Year
+				for j := 0; j < 2; j++ {
+					t := strings.Split(currentTime, "T")[1]
+					if i < 10 && k < 10 {
+						t = fmt.Sprint(l) + "-0" + fmt.Sprint(k) + "-0" + fmt.Sprint(i) + "T" + t
+					} else if i < 10 && k >= 10 {
+						t = fmt.Sprint(l) + "-" + fmt.Sprint(k) + "-0" + fmt.Sprint(i) + "T" + t
+					} else if i >= 10 && k < 10 {
+						t = fmt.Sprint(l) + "-0" + fmt.Sprint(k) + "-" + fmt.Sprint(i) + "T" + t
+					} else {
+						t = fmt.Sprint(l) + "-" + fmt.Sprint(k) + "-" + fmt.Sprint(i) + "T" + t
+					}
+					fmt.Println(t)
+					putils.Sleep(5)
+					client.Publish(viper.GetString("mqtt.topic")+"/pressure", byte(2), false, fmt.Sprintf("%s,%f,%s", putils.Aita[j], putils.RandFloat(1048, 1053), t))
+					putils.Sleep(5)
+					client.Publish(viper.GetString("mqtt.topic")+"/temperature", byte(2), false, fmt.Sprintf("%s,%f,%s", putils.Aita[j], putils.RandFloat(19, 28), t))
+					putils.Sleep(5)
+					client.Publish(viper.GetString("mqtt.topic")+"/wind", byte(2), false, fmt.Sprintf("%s,%f,%s", putils.Aita[j], putils.RandFloat(4, 8), t))
 					c++
 				}
 			}
 		}
 	}
+	fmt.Println("----")
+	fmt.Println("Sent " + fmt.Sprint(c) + " messages!")
+
+	// Add fake accross last day
+	for i := -500; i < 500; i++ {
+		t := fmt.Sprint(time.Now().Add(time.Minute * time.Duration(5*i)).Format(time.RFC3339))
+		fmt.Println(t)
+		putils.Sleep(5)
+		client.Publish(viper.GetString("mqtt.topic")+"/pressure", byte(2), false, fmt.Sprintf("%s,%f,%s", putils.Aita[0], putils.RandFloat(1048, 1053), t))
+		putils.Sleep(5)
+		client.Publish(viper.GetString("mqtt.topic")+"/temperature", byte(2), false, fmt.Sprintf("%s,%f,%s", putils.Aita[0], putils.RandFloat(19, 28), t))
+		putils.Sleep(5)
+		client.Publish(viper.GetString("mqtt.topic")+"/wind", byte(2), false, fmt.Sprintf("%s,%f,%s", putils.Aita[0], putils.RandFloat(4, 8), t))
+		c++
+	}
+
 	fmt.Println("----")
 	fmt.Println("Sent " + fmt.Sprint(c) + " messages!")
 }
