@@ -49,8 +49,9 @@ func fakeData() {
 	currentTime := fmt.Sprint(time.Now().Format(time.RFC3339))
 	// Add fake data accross the year
 	for i := 1; i <= 31; i++ { // Day
-		putils.Sleep(100)
+		putils.Sleep(300)
 		for k := 1; k <= 12; k++ { // Month
+			putils.Sleep(50)
 			for l := 2019; l <= 2020; l++ { // Year
 				for j := 0; j < 2; j++ {
 					t := strings.Split(currentTime, "T")[1]
@@ -80,7 +81,9 @@ func fakeData() {
 
 	putils.Sleep(100)
 	// Add fake accross last day
-	for i := -500; i < 500; i++ {
+	for i := -1000; i < 1000; i++ {
+		putils.Sleep(100)
+
 		t := fmt.Sprint(time.Now().Add(time.Minute * time.Duration(5*i)).Format(time.RFC3339))
 		fmt.Println(t)
 		putils.Sleep(5)
